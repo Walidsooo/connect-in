@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  # 1. Base de données
+  mysql:
+    image: mysql:8.0
+    container_name: connectin_mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: connectin_db
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: app_user
+      MYSQL_PASSWORD: app_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    # Commande : mysql -h 127.0.0.1 -P 3307 -u root -proot connectin_db
+
+  # 2. Backend (Laravel)
+  backend:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: connectin_backend
+    working_dir: /var/www
+    volumes:
+      - ./backend:/var/www
+    ports:
+      - "8000:8000"
+    environment:
+      DB_HOST: mysql
+    depends_on:
+      - mysql
+    command: sh -c "if [ -f artisan ]; then composer install --no-interaction && php artisan key:generate --force && php artisan serve --host=0.0.0.0 --port=8000; else sleep infinity; fi"
+
+  # 3. Frontend (React)
+  frontend:
+    image: node:22-alpine
+    container_name: connectin_frontend
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "5173:5173"
+    # On force le port 5173 pour éviter le saut vers 5174
+    command: sh -c "if [ -f package.json ]; then npm install && npm run dev -- --host --port 5173; else sleep infinity; fi"
+
+  # BONUS: Interface pour voir la base de données (http://localhost:8080)
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: connectin_phpmyadmin
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mysql
+    depends_on:
+      - mysql
+
+volumes:
+  db_data:

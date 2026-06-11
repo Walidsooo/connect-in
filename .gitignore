@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+dist/
+build/
+backend/public/hot
+backend/public/storage
+backend/storage/*.key
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+backend/storage/logs/*.log
+
+# Cache
+frontend/.vite/
+backend/bootstrap/cache/*
+backend/storage/framework/cache/*
+backend/storage/framework/sessions/*
+backend/storage/framework/views/*
+
+# Temporary files
+*.tmp
+*.temp
+
+# Private/project brief
+project.pdf
